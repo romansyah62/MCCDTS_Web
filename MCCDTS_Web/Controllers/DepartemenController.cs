@@ -1,18 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System;
-using System.Data.SqlClient;
+﻿using MCCDTS_Web.Context;
 using MCCDTS_Web.Models;
-using MCCDTS_Web.Context;
+using Microsoft.AspNetCore.Mvc;
 using System.Linq;
-using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace MCCDTS_Web.Controllers
 {
-    public class EmployeeController : Controller
+    public class DepartemenController : Controller
     {
         MyContext myContext;
-        public EmployeeController(MyContext myContext)
+        public DepartemenController(MyContext myContext)
         {
             this.myContext = myContext;
         }
@@ -21,7 +17,7 @@ namespace MCCDTS_Web.Controllers
         //READ
         public IActionResult Index()
         {
-            var data = myContext.Employees.ToList();
+            var data = myContext.Departemens.ToList();
             return View(data);
         }
         //CREATE
@@ -34,14 +30,14 @@ namespace MCCDTS_Web.Controllers
         //POST
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Employee karyawan)
+        public IActionResult Create(Departemen departemen)
         {
             if (ModelState.IsValid)
             {
-                myContext.Employees.Add(karyawan);
+                myContext.Departemens.Add(departemen);
                 var result = myContext.SaveChanges();
-                if (result > 0)
-                return RedirectToAction("Index");
+                if (result != 0)
+                    return RedirectToAction("Index");
             }
             return View();
         }
@@ -49,18 +45,17 @@ namespace MCCDTS_Web.Controllers
         //GET
         public IActionResult Edit(int Id)
         {
-            var data = myContext.Employees.Find(Id);
-            ViewBag.DepartmentId = new SelectList(myContext.Departemens, "Id", "Id", data.DepartemenId);
-            return View(data);
+            var result = myContext.Departemens.Find(Id);
+            return View(result);
         }
         //POST
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int Id, Employee karyawan)
+        public IActionResult Edit(Departemen departemen)
         {
             if (ModelState.IsValid)
             {
-                myContext.Employees.Update(karyawan);
+                myContext.Departemens.Update(departemen);
                 var result = myContext.SaveChanges();
                 if (result != 0)
                 {
@@ -76,30 +71,27 @@ namespace MCCDTS_Web.Controllers
         //GET
         public IActionResult Delete(int Id)
         {
-            var data = myContext.Employees.Find(Id);
-            return View(data);
+            var result = myContext.Departemens.Find(Id);
+            return View(result);
         }
 
         //POST
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete(Employee karyawan)
+        public IActionResult Delete(Departemen departemen)
         {
             if (ModelState.IsValid)
             {
-                myContext.Employees.Remove(karyawan);
+                myContext.Departemens.Remove(departemen);
                 var result = myContext.SaveChanges();
             }
             return RedirectToAction(nameof(Index));
         }
-
         public IActionResult Details(int Id)
         {
-            var data = myContext.Employees.Find(Id);
-            return View(data);
+            var result = myContext.Departemens.Find(Id);
+            return View(result);
         }
 
     }
 }
-
-
