@@ -1,5 +1,6 @@
 ﻿using API.Context;
 using API.Models;
+using API.Repositories.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
@@ -10,17 +11,17 @@ namespace API.Controllers
     [ApiController]
     public class DepartemenController : ControllerBase
     {
-        MyContext myContext;
-        public DepartemenController(MyContext myContext)
+        DepartemenRepository departemenRepository;
+        public DepartemenController(DepartemenRepository departemenRepository)
         {
-            this.myContext = myContext;
+            this.departemenRepository = departemenRepository;
         }
 
         //READ
         [HttpGet]
         public IActionResult Get()
         {
-            var data = myContext.Departemens.ToList();
+            var data = departemenRepository.Get();
             if (data.Count == 0)
                 return Ok(new { message = "Berhasil mengambil data", statusCode = 200, data = "null" });
             return Ok(new { message = "Berhasil mengambil data", statusCode = 200, data = data });
@@ -29,7 +30,7 @@ namespace API.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
-            var data = myContext.Departemens.Find(id);
+            var data = departemenRepository.Get(id);
             if (data == null)
                 return Ok(new { message = "Berhasil mengambil data", statusCode = 200, data = "null" });
             return Ok(new { message = "Berhasil mengambil data", statusCode = 200, data = data });
@@ -39,10 +40,7 @@ namespace API.Controllers
         [HttpPut("{id}")]
         public IActionResult Put(int id, Departemen departemen)
         {
-            var data = myContext.Departemens.Find(id);
-            data.Nama = departemen.Nama;
-            myContext.Departemens.Update(data);
-            var result = myContext.SaveChanges();
+            var result = departemenRepository.Put(departemen);
             if (result > 0)
                 return Ok(new { statusCode = 200, message = "Berhasil memerbaharui data" });
             return BadRequest(new { statusCode = 200, message = "Gagal memerbaharui data" });
@@ -52,8 +50,7 @@ namespace API.Controllers
         [HttpPost]
         public IActionResult Post(Departemen departemen)
         {
-            myContext.Departemens.Add(departemen);
-            var result = myContext.SaveChanges();
+            var result = departemenRepository.Post(departemen);
             if (result > 0)
                 return Ok(new { statusCode = 200, message = "Berhasil membuat data" });
             return BadRequest(new { statusCode = 200, message = "Gagal membuat data" });
@@ -63,9 +60,7 @@ namespace API.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var data = myContext.Departemens.Find(id);
-            myContext.Departemens.Remove(data);
-            var result = myContext.SaveChanges();
+            var result = departemenRepository.Delete(id);
             if (result > 0)
                 return Ok(new { statusCode = 200, message = "Berhasil menghapus data" });
             return BadRequest(new { statusCode = 200, message = "Gagal menghapus data" });

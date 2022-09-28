@@ -1,5 +1,7 @@
 ﻿using API.Context;
 using API.Models;
+using API.Repositories.Data;
+using API.Repositories.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
@@ -10,17 +12,17 @@ namespace API.Controllers
     [ApiController]
     public class AbsensiController : ControllerBase
     {
-        MyContext myContext;
-        public AbsensiController(MyContext myContext)
+        AbsensiRepository absensiRepository;
+        public AbsensiController(AbsensiRepository absensiRepository)
         {
-            this.myContext = myContext;
+            this.absensiRepository = absensiRepository;
         }
 
         //READ
         [HttpGet]
         public IActionResult Get()
         {
-            var data = myContext.Absensis.ToList();
+            var data = absensiRepository.Get();
             if (data.Count == 0)
                 return Ok(new { message = "Berhasil mengambil data", statusCode = 200, data = "null" });
             return Ok(new { message = "Berhasil mengambil data", statusCode = 200, data = data });
@@ -29,7 +31,7 @@ namespace API.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
-            var data = myContext.Absensis.Find(id);
+            var data = absensiRepository.Get(id);
             if (data == null)
                 return Ok(new { message = "Berhasil mengambil data", statusCode = 200, data = "null" });
             return Ok(new { message = "Berhasil mengambil data", statusCode = 200, data = data });
@@ -39,10 +41,7 @@ namespace API.Controllers
         [HttpPut("{id}")]
         public IActionResult Put(int id, Absensi absensi)
         {
-            var data = myContext.Absensis.Find(id);
-            data.Waktu = absensi.Waktu;
-            myContext.Absensis.Update(data);
-            var result = myContext.SaveChanges();
+            var result = absensiRepository.Put(absensi);
             if (result > 0)
                 return Ok(new { statusCode = 200, message = "Berhasil memerbaharui data" });
             return BadRequest(new { statusCode = 200, message = "Gagal memerbaharui data" });
@@ -52,8 +51,7 @@ namespace API.Controllers
         [HttpPost]
         public IActionResult Post(Absensi absensi)
         {
-            myContext.Absensis.Add(absensi);
-            var result = myContext.SaveChanges();
+            var result = absensiRepository.Post(absensi);
             if (result > 0)
                 return Ok(new { statusCode = 200, message = "Berhasil membuat data" });
             return BadRequest(new { statusCode = 200, message = "Gagal membuat data" });
@@ -63,9 +61,7 @@ namespace API.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var data = myContext.Absensis.Find(id);
-            myContext.Absensis.Remove(data);
-            var result = myContext.SaveChanges();
+            var result = absensiRepository.Delete(id);
             if (result > 0)
                 return Ok(new { statusCode = 200, message = "Berhasil menghapus data" });
             return BadRequest(new { statusCode = 200, message = "Gagal menghapus data" });
